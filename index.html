@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sofia Explorer</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100dvh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Sidebar */
+
+.sidebar {
+    width: 360px;
+    background: #ffffff;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 2px 0 10px rgba(0,0,0,.15);
+    z-index: 1000;
+}
+
+h1 {
+    margin-top:0;
+    color:#222;
+}
+
+.filters {
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+}
+
+.filters button {
+    border:none;
+    padding:8px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* Category colors */
+
+.filters button:nth-child(1) {
+    background:#555;
+}
+
+.filters button:nth-child(2) {
+    background:#8e44ad;
+}
+
+.filters button:nth-child(3) {
+    background:#2980b9;
+}
+
+.filters button:nth-child(4) {
+    background:#27ae60;
+}
+
+.filters button:nth-child(5) {
+    background:#d35400;
+}
+
+
+.filters button:hover {
+    opacity:0.8;
+}
+
+
+.card {
+    width:100%;
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:10px;
+    background:#f7f7f7;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.card strong {
+    font-size:14px;
+}
+
+.card p {
+    margin:6px 0 0 0;
+    font-size:12px;
+    line-height:1.3;
+}
+
+.badge {
+
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:12px;
+    font-size:12px;
+    color:white;
+
+}
+.church {
+    background:#8e44ad;
+}
+
+.museum {
+    background:#2980b9;
+}
+
+.park {
+    background:#27ae60;
+}
+
+.culture {
+    background:#d35400;
+}
+
+
+/* Map */
+
+#map {
+    flex:1;
+    height:100%;
+}
+
+@media(max-width:800px){
+
+body {
+    flex-direction:column;
+}
+
+.sidebar {
+    width:100%;
+    height:35dvh;
+    padding:15px;
+}
+
+.sidebar h1 {
+    font-size:30px;
+}
+    
+#map {
+    height:65dvh;
+}
+
+.card {
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:10px;
+    background:#f7f7f7;
+    cursor:pointer;
+}
+
+.card:hover {
+    background:#eaeaea;
+}
+
+.filters button {
+    flex:1 1 auto;
+}
+
+}
+.leaflet-popup-content {
+    max-width:250px;
+}
+
+.leaflet-popup-content img {
+    width:100%;
+    height:180px;
+}
+.leaflet-control-zoom a {
+    width:40px;
+    height:40px;
+    line-height:40px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="sidebar">
+
+
+<h1>🇧🇬 Sofia Explorer</h1>
+
+<div class="filters">
+
+<button onclick="filter('all')">All</button>
+<button onclick="filter('church')">Churches</button>
+<button onclick="filter('museum')">Museums</button>
+<button onclick="filter('park')">Parks</button>
+<button onclick="filter('culture')">Culture</button>
+
+</div>
+
+
+<hr>
+
+<div id="list"></div>
+
+
+</div>
+
+
+<div id="map"></div>
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<script>
+
+
+// =======================
+// Attraction database
+// Add your places here
+// =======================
+
+
+const places = [
+{
+name:"National Palace of Culture (NDK)",
+category:"culture",
+lat:42.6854,
+lng:23.3170,
+image:"ndk.jpg",
+summary:"Major cultural center and landmark of modern Sofia.",
+description:
+"Opened in 1981, the National Palace of Culture is the largest multifunctional conference and exhibition center in Southeastern Europe. Visitors can enjoy its striking architecture, vast halls, surrounding park, and rotating art exhibitions."
+},
+
+{
+name:"Ivan Vazov National Theatre",
+category:"culture",
+lat:42.694579466674135,
+lng:23.326128405809136,
+image:"ivan-vazov.jpg",
+summary:"One of Sofia’s most iconic cultural landmarks.",
+description:
+"Opened in 1907, the Ivan Vazov National Theatre is Bulgaria’s oldest and most prestigious theatre. It survived a devastating fire, wartime damage, and major restorations. Visitors can admire its ornate façade, decorative details, and elegant setting in the City Garden."
+},
+
+{
+name:"National Art Gallery",
+category:"culture",
+lat:42.696280050134604,
+lng:23.327114161557756,
+image:"national-art-gallery.jpg",
+summary:"Bulgaria’s premier gallery for centuries of national and contemporary art.",
+description:
+"The National Gallery, housed in the former Royal Palace in central Sofia, is Bulgaria’s largest art museum. Its collections include medieval icons, masterpieces by renowned Bulgarian artists, and contemporary works, tracing the nation’s artistic heritage."
+},
+    
+
+{
+name:"Kvadrat 500 - National Gallery",
+category:"culture",
+lat:42.69635750116253,
+lng:23.334273667225126,
+image:"National_Gallery.jpg",
+summary:"Bulgaria’s largest museum for Bulgarian and international art.",
+description:
+"Kvadrat 500 is the National Gallery’s main exhibition space, opened in 2015 near Alexander Nevsky Cathedral in Sofia. Created by transforming a former printing house complex, the museum combines historic architecture with modern gallery spaces. Its 28 halls display Bulgarian, European, Asian, African, and American artworks across four floors."
+ },  
+
+{
+name:"Sofia City Art Gallery",
+category:"culture",
+lat:42.69470231956153,
+lng:23.324376611449814,
+image:"sofia-city-art-gallery.jpg",
+summary:"Sofia’s leading municipal gallery for Bulgarian and contemporary art.",
+description:
+"Sofia City Art Gallery was founded in 1928 and is located in a historic building in the City Garden, near Ivan Vazov National Theatre. The gallery preserves and presents Bulgarian art from the late 19th century to today, while also hosting contemporary and international exhibitions. Its programs include painting, sculpture, photography, and multimedia projects."
+},
+
+{
+name:"Alexander Nevsky Cathedral",
+category:"church",
+lat:42.6959,
+lng:23.3329,
+image:"alex-nevski.jpg",
+summary:"Iconic Orthodox cathedral and one of Sofia's most famous landmarks.",
+description:
+"Built between 1882 and 1912, Alexander Nevsky Cathedral is Sofia’s iconic landmark. Named after the Russian saint and prince, it features golden domes, stunning mosaics, and a crypt gallery displaying one of the world’s finest collections of Orthodox icons."
+},
+    
+    
+{
+name:"Boyana Church",
+category:"church",
+lat:42.6447,
+lng:23.2668,
+image:"boyana-church.jpg",
+summary:"UNESCO World Heritage church famous for medieval frescoes.",
+description:
+"Built in the 10th century near Vitosha Mountain, Boyana Church is famous for its 1259 frescoes, masterpieces of medieval art. A UNESCO World Heritage Site, it preserves extraordinary portraits and rare glimpses of medieval Bulgarian culture and life."
+},
+
+
+{
+name:"Ancient Serdica",
+category:"museum",
+lat:42.69852222815977,
+lng:23.322269674940024,
+image:"Ancient-Serdica.jpg",
+summary:"Roman ruins integrated into the modern city center.",
+description:
+"Discovered during the construction of Sofia’s metro, Ancient Serdica reveals the remains of the Roman city beneath modern streets. Visitors can explore preserved ruins, mosaics, and ancient streets that showcase Sofia’s history as a major Roman settlement."
+},
+
+{
+name:"Regional History Museum Sofia",
+category:"museum",
+lat:42.69949645141217,
+lng:23.32379498146233,
+image:"regional-museum.jpg",
+summary:"Museum covering Sofia's history from ancient times.",
+description:
+"Located in the iconic former Central Mineral Baths building, the museum tells the story of the city’s evolution across thousands of years. Through archaeological treasures, royal artifacts, and everyday objects, the museum reveals Sofia’s Roman roots, cultural heritage, and transformation."
+},
+ 
+{
+name:"Earth and Man National Museum",
+category:"museum",
+lat:42.68007361671565,
+lng:23.32066826228213,
+image:"muzei-zemyata-i-horata-sofia.jpg",
+summary:"An extensive collection of minerals, crystals, gemstones, and geological specimens",
+description:
+"The museum houses an extensive collection of minerals, crystals, gemstones, and geological specimens from Bulgaria and around the world. Its highlights include the Giant Crystals exhibition, one of the two largest collections of its kind in the world."
+},
+
+{
+name:"National Museum of Military History",
+category:"museum",
+lat:42.68758216419453,
+lng:23.35065786389617,
+image:"NIM.jpg",
+summary:"Historic artifacts, vehicles, and exhibitions",
+description:
+"The museum presents Bulgaria’s military heritage through an extensive collection of weapons, uniforms, flags, vehicles, and historical artifacts. Its outdoor exhibition features tanks, aircraft, and artillery displayed in a large open-air area."
+},
+
+{
+name:"Museum of the Art from the Socialist Period",
+category:"museum",
+lat:42.666017106373864,
+lng:23.358247927240953,
+image:"socialist-museum.jpg",
+summary:"Art and artifacts from Bulgaria’s socialist era.",
+description:
+"The museum presents paintings, sculptures, and other artworks from 1944-1989. Its outdoor garden displays monumental socialist-era sculptures, once placed in prominent locations across Bulgaria."
+},
+
+{
+name:"Borisova Gradina",
+category:"park",
+lat:42.6836,
+lng:23.3367,
+image:"Borisova-garden.jpg",
+summary:"Sofia's largest historic park, ideal for walking.",
+description:
+"Created in 1884, Borisova Gradina is Sofia’s oldest and largest park. Visitors can enjoy its tree-lined paths, peaceful lakes, monuments, and gardens."
+},
+
+];
+
+
+
+// =======================
+// Map
+// =======================
+
+
+const map = L.map('map')
+.setView([42.6977,23.3219],13);
+
+
+L.tileLayer(
+'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+{
+ attribution:'Tiles © Esri'
+}
+).addTo(map);
+
+let markers=[];
+
+
+
+function icon(category){
+
+let color={
+church:"#8e44ad",
+museum:"#2980b9",
+park:"#27ae60",
+culture:"#d35400"
+}[category];
+
+
+return L.divIcon({
+
+html:
+`
+<div style="
+background:${color};
+width:32px;
+height:32px;
+border-radius:50%;
+border:3px solid white;
+box-shadow:0 0 5px #555;
+">
+</div>
+`
+,
+className: "",
+iconSize:[32,32],
+iconAnchor:[16,16]
+
+});
+
+}
+
+// =======================
+// HOME / HOTEL PIN
+// =======================
+
+const home = {
+    name: "My Hotel",
+    lat: 42.6662853341034,  
+    lng: 23.367071810521303
+};
+
+
+const homeIcon = L.icon({
+
+    iconUrl:
+    "https://cdn-icons-png.flaticon.com/512/25/25694.png",
+
+    iconSize:[35,35],
+
+    iconAnchor:[17,35]
+
+});
+
+
+L.marker(
+    [home.lat, home.lng],
+    {
+        icon: homeIcon
+    }
+)
+.addTo(map)
+    
+.bindPopup(`
+
+<h3>🏠 ${home.name}</h3>
+
+<p>Your accommodation</p>
+
+<a 
+href="https://www.google.com/maps/dir/?api=1&destination=${home.lat},${home.lng}&travelmode=transit"
+target="_blank"
+style="
+display:inline-block;
+padding:8px 12px;
+background:#4285F4;
+color:white;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+">
+➤ Directions Home
+</a>
+
+`);
+
+// =======================
+// Display places
+// =======================
+
+
+function displayPlaces(data){
+
+
+markers.forEach(m=>map.removeLayer(m));
+
+markers=[];
+
+
+const list=document.getElementById("list");
+
+list.innerHTML="";
+
+
+data.forEach(place=>{
+
+
+let marker=L.marker(
+[place.lat,place.lng],
+{
+icon:icon(place.category)
+})
+.addTo(map);
+
+marker.bindPopup(`
+
+<h3>${place.name}</h3>
+<img 
+src="${place.image}" 
+style="
+width:100%;
+max-width:300px;
+border-radius:8px;
+margin-bottom:10px;
+">
+
+<p>${place.description}</p>
+
+<a 
+href="https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=transit"
+target="_blank"
+style="
+display:inline-block;
+padding:8px 12px;
+background:#4285F4;
+color:white;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+">
+➤ Get Directions
+</a>
+
+`, {
+     maxWidth:350,
+    autoPan:true,
+    keepInView:true,
+    autoPanPaddingTopLeft:
+        window.innerWidth <= 800
+        ? L.point(20, 20)
+        : L.point(20, 170),
+    autoPanPaddingBottomRight: L.point(20,20)
+});
+markers.push(marker);
+
+
+
+let card=document.createElement("div");
+
+card.className="card";
+
+
+card.innerHTML=`
+
+<strong>${place.name}</strong><br>
+
+<span class="badge ${place.category}">
+${place.category}
+</span>
+
+<p>${place.summary}</p>
+
+`;
+
+
+card.onclick=()=>{
+
+map.flyTo(
+[place.lat+0.0032,place.lng],
+16
+);
+
+marker.openPopup();
+
+};
+
+
+list.appendChild(card);
+
+
+});
+
+
+}
+
+
+
+displayPlaces(places);
+
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+});
+
+window.addEventListener("resize", () => {
+    map.invalidateSize();
+});
+    
+// =======================
+// Filters
+// =======================
+
+
+function filter(category){
+
+if(category==="all")
+displayPlaces(places);
+
+else
+displayPlaces(
+places.filter(
+p=>p.category===category
+)
+);
+
+}
+
+
+</script>
+
+
+</body>
+</html>
