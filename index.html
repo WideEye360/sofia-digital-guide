@@ -290,33 +290,35 @@ body {
     line-height:40px;
 }
 
-#backButton{
+#backButton {
+    position: absolute;
+    top: 14px;
+    right: 14px;
 
-    position:absolute;
-    top:20px;
-    right:20px;
+    z-index: 1500;
 
-    z-index:1500;
+    width: 42px;
+    height: 42px;
 
-    padding:12px 18px;
+    border: none;
+    border-radius: 50%;
 
-    border:none;
-    border-radius:30px;
+    background: rgba(255,255,255,.9);
+    color: #222;
 
-    background:rgba(255,255,255,.9);
-    color:#222;
+    font-size: 20px;
+    font-weight: bold;
 
-    font-size:15px;
-    font-weight:bold;
+    cursor: pointer;
 
-    cursor:pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
 
-    box-shadow:0 4px 12px rgba(0,0,0,.2);
+    box-shadow: 0 3px 8px rgba(0,0,0,.18);
 
-    display:none;
-
+    -webkit-tap-highlight-color: transparent;
 }
-
 #backButton:hover{
     background:white;
 }
@@ -420,7 +422,7 @@ Useful information
 </div><div id="map"></div>
 
 <button id="backButton" onclick="showWelcome()">
-    ← Back
+    ←
 </button>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
