@@ -606,9 +606,7 @@ list.appendChild(card);
 displayPlaces(places);
 
 window.addEventListener("load", () => {
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 300);
+    map.invalidateSize();
 });
 
 window.addEventListener("resize", () => {
