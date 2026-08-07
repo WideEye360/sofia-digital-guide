@@ -291,40 +291,29 @@ body {
 }
 
 #backButton{
+
     position:absolute;
     top:20px;
     right:20px;
+
     z-index:1500;
 
     padding:12px 18px;
+
     border:none;
     border-radius:30px;
 
-    background:rgba(255,255,255,.92);
+    background:rgba(255,255,255,.9);
     color:#222;
 
     font-size:15px;
     font-weight:bold;
 
     cursor:pointer;
+
     box-shadow:0 4px 12px rgba(0,0,0,.2);
 
     display:none;
-}
-
-#backButton:hover{
-    background:white;
-}
-
-@media (max-width:800px){
-
-    #backButton{
-        top:12px;
-        right:12px;
-
-        padding:10px 14px;
-        font-size:14px;
-    }
 
 }
 
@@ -431,7 +420,7 @@ Useful information
 </div><div id="map"></div>
 
 <button id="backButton" onclick="showWelcome()">
-    ← Back to Menu
+    ← Back
 </button>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
