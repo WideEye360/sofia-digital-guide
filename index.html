@@ -292,13 +292,13 @@ body {
 
 #backButton {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 12px;
+    right: 12px;
 
     z-index: 1500;
 
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
 
     border: none;
     border-radius: 50%;
@@ -306,7 +306,7 @@ body {
     background: rgba(255,255,255,.9);
     color: #222;
 
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
 
     cursor: pointer;
@@ -315,9 +315,13 @@ body {
     align-items: center;
     justify-content: center;
 
-    box-shadow: 0 3px 8px rgba(0,0,0,.18);
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
 
     -webkit-tap-highlight-color: transparent;
+}
+
+#backButton:active {
+    transform: scale(.92);
 }
 #backButton:hover{
     background:white;
