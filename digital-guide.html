@@ -612,6 +612,60 @@ font-weight:bold;
 `);
 
 // =======================
+// TOURIST INFORMATION CENTRE
+// =======================
+
+const touristCentre = {
+    name: "Tourist Information Centre 'Tram 83'",
+    lat: 42.69984978545467,
+    lng: 23.322570385454345
+};
+
+
+const infoIcon = L.icon({
+
+    iconUrl:
+    "https://upload.wikimedia.org/wikipedia/commons/5/50/Circle_info_blue.svg?utm_source=commons.w",
+
+    iconSize:[35,35],
+
+    iconAnchor:[17,35]
+
+});
+
+
+L.marker(
+    [touristCentre.lat, touristCentre.lng],
+    {
+        icon: infoIcon
+    }
+)
+.addTo(map)
+
+.bindPopup(`
+
+<h3>ℹ️ ${touristCentre.name}</h3>
+
+<p>A restored 1930s tram turned into a unique tourist information centre in Sofia.</p>
+
+<a 
+href="https://www.google.com/maps/dir/?api=1&destination=${touristCentre.lat},${touristCentre.lng}&travelmode=transit"
+target="_blank"
+style="
+display:inline-block;
+padding:8px 12px;
+background:#4285F4;
+color:white;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+">
+➤ Directions to Tourist Centre
+</a>
+
+`);
+
+// =======================
 // Display places
 // =======================
 
