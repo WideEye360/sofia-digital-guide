@@ -379,6 +379,17 @@ else {
                 conf.scenes[s.id] = { "type": "equirectangular", "panorama": s.url, "pitch": s.startPitch || 0, "yaw": s.startYaw || 0, "hotSpots": [...navH, ...infoH] };
             });
             viewer = pannellum.viewer('panorama', conf);
+          document.getElementById('panorama').addEventListener('wheel', function(e) {
+    e.preventDefault();
+
+    let hfov = viewer.getHfov();
+
+    hfov += e.deltaY > 0 ? 10 : -10;
+
+    hfov = Math.max(110, Math.min(130, hfov));
+
+    viewer.setHfov(hfov,300);
+}, { passive: false });
             applyPanoramaFrame();
 
             if(d.plan) { document.getElementById('minimap').style.display = 'block'; document.getElementById('plan-img').src = d.plan; renderMarkers(); }
