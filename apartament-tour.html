@@ -344,12 +344,12 @@ else {
                 if(!targetScene) return; 
 
                 if (args.targetPitch !== undefined && args.targetYaw !== undefined) {
-                    viewer.loadScene(args.targetId, args.targetPitch, args.targetYaw, isMobile ? HFOV_MOBILE : HFOV_DESKTOP);
+                    viewer.loadScene(args.targetId, args.targetPitch, args.targetYaw, viewer.getHfov());
 		activeId = args.targetId;
 		renderThumbnailsBar();
                 } else {
                     let globalYaw = currentYaw - (activeScene.northOffset || 0);
-                    viewer.loadScene(args.targetId, currentPitch, globalYaw + (targetScene.northOffset || 0), isMobile ? HFOV_MOBILE : HFOV_DESKTOP);
+                    iewer.loadScene(args.targetId, currentPitch, globalYaw + (targetScene.northOffset || 0), viewer.getHfov());
 		activeId = args.targetId;
 		renderThumbnailsBar();
                 }
