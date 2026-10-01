@@ -409,7 +409,7 @@ else {
             updateTitle();
             renderMarkers();
             if(isThumbnailsOpen) renderThumbnailsBar();
-            if(viewer.getScene() !== id) viewer.loadScene(id, s.startPitch || 0, s.startYaw || 0, isMobile ? HFOV_MOBILE : HFOV_DESKTOP);
+            if(viewer.getScene() !== id) viewer.loadScene(id, s.startPitch || 0, s.startYaw || 0, viewer.getHfov());
         }
 
         function updateTitle() {
